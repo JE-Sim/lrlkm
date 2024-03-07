@@ -59,7 +59,7 @@ train_x <- matrix(rnorm(10 * 2), nrow = 10)
 train_y <- rnorm(10)
 
 # Train the model#'
-LRL_objective <- l2_obj(type = 'linear', lambda=0.1, loss = 'logistic')
+LRL_objective <- l2_obj(lambda=0.1, loss = 'logistic')
 LRL_trainer <- trainer(LRL_objective, SGD_optim(), tol = 1e-5)
 result <- LRL_trainer(train_x, train_y, batch_size = 64)
 plot(result$cost_history, xlab = 'epoch', ylab = 'cost function', pch=20)

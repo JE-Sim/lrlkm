@@ -32,7 +32,7 @@
 #' train_y <- rnorm(10)
 #'
 #' # Train the model#'
-#' LRL_objective <- l2_obj(type = 'linear', lambda=0.1, loss = 'logistic')
+#' LRL_objective <- l2_obj(lambda=0.1, loss = 'logistic')
 #' LRL_trainer <- trainer(LRL_objective, SGD_optim(), tol = 1e-5)
 #' result <- LRL_trainer(train_x, train_y, batch_size = 64)
 #' plot(result$cost_history, xlab = 'epoch', ylab = 'cost function', pch=20)
@@ -102,7 +102,7 @@ trainer <- function(objective, optimizer, tol = 1e-5, epochs = 10000, ...){
 #' The function assumes the model has linear parameters accessible through the object.
 #' @param obj A fitted model object containing the model parameters..
 #' @param test_x A numeric matrix for prediction.
-#' @param ... Additional arguments passed to the prediction method of the model.
+#' @param type A string specifying prediction method of the model.
 #' @return A numeric vector of predicted values for the given data points.
 #' @export
 #'
@@ -113,16 +113,17 @@ trainer <- function(objective, optimizer, tol = 1e-5, epochs = 10000, ...){
 #' train_y <- rnorm(10)
 #'
 #' # Training the model
-#' LRL_objective <- l2_obj(type = 'linear', lambda=0.1, loss = 'logistic')
+#' LRL_objective <- l2_obj(lambda=0.1, loss = 'logistic')
 #' LRL_trainer <- trainer(LRL_objective, SGD_optim(), tol = 1e-5)
 #' result <- LRL_trainer(train_x, train_y, batch_size = 64)
 #'
 #' predictor(result, test_x)
-predictor <- function(obj, test_x, ...){
+predictor <- function(obj, test_x, type = NULL){
   if(is.vector(test_x)) test_x <- matrix(test_x, nrow=1)
+  if(!('matrix' %in% class(test_x))) warning("test_x should be matrix!")
   fhat <- test_x %*% obj$params[-1] + obj$params[1]
-  if(hasArg(type) && (type == 'binary')) fhat <- sign(fhat)
-  return(fhat)
+  if(!is.null(type) && type == 'binary') fhat <- sign(fhat)
+  return(as.numeric(fhat))
 }
 
 
