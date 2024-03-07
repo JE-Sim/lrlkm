@@ -1,0 +1,23 @@
+Package: lrlkm
+Title: Low-Rank Linearization Kernel Machine
+Version: 0.0.0.9000
+Authors@R: c(
+    person(given = "Jeongeun",
+           family = "Sim",
+           role = c("aut", "cre"),
+           email = "sim0348@korea.ac.kr"),
+    person(given = "Yukung",
+           family = "Kim",
+           role = c("aut"),
+           email = "kdbrud@korea.ac.kr"),
+    person(given = "Seung Jun",
+           family = "Shin",
+           role = c("aut"),
+           email = "sjshin@korea.ac.kr"))
+Description: Low-Rank Linearization for kernel machines. 'lrlkm' includes Support Vector Classification, Support Vector Regression, Ridge Regression, Quantile Regression, Logistic Regression, and Gradient based optimizers.
+License: GPL (>= 2)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
+Imports: 
+    kernlab
