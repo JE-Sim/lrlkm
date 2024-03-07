@@ -1,5 +1,6 @@
 ---
 output: github_document
+bibliography: "references.bib"
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -9,8 +10,9 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "50%"
 )
+library(knitr)
 ```
 
 # lrlkm
@@ -18,38 +20,62 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of lrlkm is to ...
+lrlkm provides a low rank linearization for general kernel machine. Since the commonly used kernel has symmetric positive semi-definite (SPSD) kernel matrix, the kernel matrix $K$ might be well decompose.
+$$
+K = F F^T
+$$
+This package implements above $F$ which is an empirical version of kernel map, and trainer of $\ell_2$ regularized linear machine with various loss functions and optimizers.
 
 ## Installation
 
 You can install the development version of lrlkm like so:
 
-``` {r install}
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
+``` r
 devtools::install_github('JE-Sim/lrlkm')
 ```
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
-
 ```{r example}
 library(lrlkm)
-## basic example code
+data(iris)
+head(iris)
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
-
-```{r cars}
-summary(cars)
+```{r empirical mapping}
+library(kernlab)
+set.seed(1234)
+train_id <- sample(1:150, 100)
+y <- (iris$Species != 'versicolor')*2-1
+landmarks <- sample(1:100, 10)
+emp_kernel <- emp_kernel_map(iris[train_id, 1:4], landmarks, rbfdot(sigma = .5), q = .95)
+F_train <- emp_kernel()
+F_test <- emp_kernel(iris[-train_id, 1:4])
+print(rbind(dim(F_train), dim(F_test)))
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
-
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
+```{r train model, fig.width=5, fig.height=4}
+# Train the model
+LRL_objective <- l2_obj(lambda = 0.0001, loss = 'svm')
+LRL_trainer <- trainer(LRL_objective, SGD_optim(), tol = 1e-5)
+result <- LRL_trainer(F_train, y[train_id], batch_size = 'full')
+par(mar = c(4.1, 4.1, 1.1, 1.1))
+plot(result$cost_history, xlab = 'epoch', ylab = 'cost function', pch = 20)
 ```
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+```{r prediction, fig.width=5, fig.height=4}
+# prediction
+fitted_y <- predictor(result, F_test, type = 'binary')
+
+table(y[-train_id], fitted_y) # Confusion Matrix
+par(mar = c(4.1, 4.1, 1.1, 1.1))
+plot(princomp(iris[-train_id, 1:4])$scores[,1:2], col = (y[-train_id]+1)/2+1, pch = (fitted_y+1)/2 + 1)
+legend('bottomright', legend = c('true 1', 'true -1'), col=2:1, pch=1)
+legend('bottomleft', legend = c('fitted 1', 'fitted -1'), pch = 2:1, col=1)
+```
+
+## Reference
+
+---
+nocite: '@*'
+...

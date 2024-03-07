@@ -80,7 +80,7 @@ l2_obj <- function(loss, lambda = 0.1, loss_input = NULL, ...){
     if(is.null(loss_input)) loss_input <- loss_components('binary')
   }
 
-  if(!hasArg(loss_input)) warning("unused arguments (loss_input). Proper loss_input is required!")
+  if(is.null(loss_input)) warning("unused arguments (loss_input). Proper loss_input is required!")
 
   rval <- function(params, train_x, train_y){
     if(is.vector(train_x)) train_x <- matrix(train_x, nrow=1)

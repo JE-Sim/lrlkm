@@ -27,6 +27,7 @@
 #' F_train <- emp_kernel() # empirical kernel mapping for training data
 #' F_test <- emp_kernel(iris[101:150, 1:4]) # empirical kernel mapping for test data
 emp_kernel_map <- function(train_x, landmarks, kernel, q = NULL, scale = T){
+  train_x <- as.matrix(train_x)
   if(scale){
     scaler <- standardScaler(train_x)
     train_x <- as.matrix(scaler())
@@ -38,7 +39,10 @@ emp_kernel_map <- function(train_x, landmarks, kernel, q = NULL, scale = T){
   M <- tcrossprod(evd$u[,1:sel], diag(sel)*(1/sqrt(evd$d[1:sel])))
   rval <- function(test_x = NULL){
     if(scale) test_x <- as.matrix(scaler(test_x))
-    if(is.null(test_x)) K <- kernlab::kernelMatrix(kernel, test_x, train_x[landmarks,])
+    if(!is.null(test_x)){
+      test_x <- as.matrix(test_x)
+      K <- kernlab::kernelMatrix(kernel, test_x, train_x[landmarks,])
+    }
     return(K %*% M)
   }
 }
