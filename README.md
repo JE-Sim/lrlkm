@@ -9,9 +9,7 @@
 lrlkm provides a low rank linearization for general kernel machine.
 Since the commonly used kernel has symmetric positive semi-definite
 (SPSD) kernel matrix, the kernel matrix $K$ might be well decompose. 
-$$
-K = F F^T
-$$ 
+$$ K = F F^T $$ 
 This package implements above $F$ which is an empirical version of
 kernel map, and trainer of $\ell_2$ regularized linear machine with
 various loss functions and optimizers.
